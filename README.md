@@ -10,7 +10,17 @@ This library provides 7-Zip (.7z) archive handling and extraction to the PlaySta
 ### Exports
 
  - Extract7zFile
+ ```c
+int Extract7zFile(const char *srcFile, const char *destDir);
+ ```
  - Test7zFile
+ ```c
+int Test7zFile(const char *srcFile); 
+ ```
+ - List7zFile
+ ```c
+int List7zFile(const char *srcFile, callback7z_t callback);
+ ```
 
 ## Build/Install
 
