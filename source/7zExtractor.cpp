@@ -19,7 +19,7 @@ static const ISzAlloc g_Alloc = {SzAlloc, SzFree};
 
 static SRes
 extractStream(ISeekInStream *seekStream, const char *destDir,
-              const int options, size_t inBufSize) {
+              const int options, callback7z_t callback, size_t inBufSize) {
 
     ISzAlloc allocImp = g_Alloc;
     ISzAlloc allocTempImp = g_Alloc;
@@ -79,6 +79,9 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
                 break;
             }
             UInt64 fileSize = SzArEx_GetFileSize(&db, i);
+
+            if (callback)
+                callback ((char*) fileNameBuf.data, fileSize, i+1, db.NumFiles);
 
             if (options & OPTION_DETAIL) {
                 char attr[8], file_size[32], file_time[32];
@@ -150,33 +153,42 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
     return res;
 }
 
-/**
- * extract all from 7z
- */
-int Extract7zFile(const char *srcFile, const char *destDir, unsigned long inBufSize) {
+int _process7zFile(const char *srcFile, const char *destDir, int opts, callback7z_t callback, size_t inBufSize)
+{
     CFileInStream archiveStream;
     if (InFile_Open(&archiveStream.file, srcFile)) {
         PrintError("Input File Open Error");
         return SZ_ERROR_ARCHIVE;
     }
     FileInStream_CreateVTable(&archiveStream);
-    SRes res = extractStream(&archiveStream.vt, destDir, OPTION_EXTRACT,
-                             (size_t) inBufSize);
+    SRes res = extractStream(&archiveStream.vt, destDir, opts, callback, inBufSize);
     File_Close(&archiveStream.file);
 
     return res;
 }
 
-int Test7zFile(const char *srcFile, unsigned long inBufSize) {
-    CFileInStream archiveStream;
-    if (InFile_Open(&archiveStream.file, srcFile)) {
-        PrintError("Input File Open Error");
-        return SZ_ERROR_ARCHIVE;
-    }
-    FileInStream_CreateVTable(&archiveStream);
-    SRes res = extractStream(&archiveStream.vt, NULL, OPTION_TEST,
-                             (size_t) inBufSize);
-    File_Close(&archiveStream.file);
+/**
+ * extract all from 7z
+ */
+int Extract7zFileEx(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize)
+{
+    return _process7zFile(srcFile, destDir, OPTION_EXTRACT, callback, inBufSize);
+}
 
-    return res;
+int Test7zFileEx(const char *srcFile, callback7z_t callback, unsigned long inBufSize)
+{
+    return _process7zFile(srcFile, NULL, OPTION_TEST, callback, inBufSize);
+}
+
+int List7zFile(const char *srcFile, callback7z_t callback)
+{
+    return _process7zFile(srcFile, NULL, 0, callback, DEFAULT_IN_BUF_SIZE);
+}
+
+int Extract7zFile(const char *srcFile, const char *destDir) {
+    return Extract7zFileEx(srcFile, destDir, NULL, DEFAULT_IN_BUF_SIZE);
+}
+
+int Test7zFile(const char *srcFile) {
+    return Test7zFileEx(srcFile, NULL, DEFAULT_IN_BUF_SIZE);
 }
