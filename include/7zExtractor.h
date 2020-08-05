@@ -12,7 +12,8 @@
 extern "C" {
 #endif
 
-int extract7zFile(const char *srcFile, const char *destDir, unsigned long inBufSize);
+int Extract7zFile(const char *srcFile, const char *destDir, unsigned long inBufSize);
+int Test7zFile(const char *srcFile, unsigned long inBufSize);
 
 #ifdef __cplusplus
 }

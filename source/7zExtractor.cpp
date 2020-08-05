@@ -29,7 +29,6 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
     UInt16 *temp = nullptr;
     size_t tempSize = 0;
 
-//    LOGD("Stream In Buffer Size:[0X%lX]", inBufSize);
     LookToRead2_CreateVTable(&lookStream, False);
     lookStream.buf = nullptr;
     res = SZ_OK;
@@ -154,18 +153,30 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
 /**
  * extract all from 7z
  */
-int extract7zFile(const char *srcFile, const char *destDir, unsigned long inBufSize) {
+int Extract7zFile(const char *srcFile, const char *destDir, unsigned long inBufSize) {
     CFileInStream archiveStream;
     if (InFile_Open(&archiveStream.file, srcFile)) {
-//        PrintError("Input File Open Error");
+        PrintError("Input File Open Error");
         return SZ_ERROR_ARCHIVE;
     }
     FileInStream_CreateVTable(&archiveStream);
     SRes res = extractStream(&archiveStream.vt, destDir, OPTION_EXTRACT,
                              (size_t) inBufSize);
     File_Close(&archiveStream.file);
-    if (res == SZ_OK) {
-//        CallJavaVoidMethod(env, callback, onSucceed);
+
+    return res;
+}
+
+int Test7zFile(const char *srcFile, unsigned long inBufSize) {
+    CFileInStream archiveStream;
+    if (InFile_Open(&archiveStream.file, srcFile)) {
+        PrintError("Input File Open Error");
+        return SZ_ERROR_ARCHIVE;
     }
+    FileInStream_CreateVTable(&archiveStream);
+    SRes res = extractStream(&archiveStream.vt, NULL, OPTION_TEST,
+                             (size_t) inBufSize);
+    File_Close(&archiveStream.file);
+
     return res;
 }

@@ -24,11 +24,15 @@
 static const ISzAlloc g_Alloc = {SzAlloc, SzFree};
 
 void Print(const char *s) {
+#ifdef PRINT_STDOUT
     printf("%s", s);
+#endif
 }
 
 void PrintError(const char *s) {
+#ifdef PRINT_STDOUT
     printf("%s", s);
+#endif
 }
 
 static int Buf_EnsureSize(CBuf *dest, size_t size) {
