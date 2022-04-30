@@ -2,6 +2,7 @@
 // Created by huzongyao on 17-11-24.
 //
 
+#include <sys/stat.h>
 #include "7zExtractor.h"
 #include "7zTypes.h"
 #include "7z.h"
@@ -153,13 +154,14 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
     return res;
 }
 
-int _process7zFile(const char *srcFile, const char *destDir, int opts, callback7z_t callback, size_t inBufSize)
+static int _process7zFile(const char *srcFile, const char *destDir, int opts, callback7z_t callback, size_t inBufSize)
 {
     CFileInStream archiveStream;
     if (InFile_Open(&archiveStream.file, srcFile)) {
         PrintError("Input File Open Error");
         return SZ_ERROR_ARCHIVE;
     }
+    mkdir(destDir, 0777);
     FileInStream_CreateVTable(&archiveStream);
     SRes res = extractStream(&archiveStream.vt, destDir, opts, callback, inBufSize);
     File_Close(&archiveStream.file);
@@ -183,12 +185,4 @@ int Test7zFileEx(const char *srcFile, callback7z_t callback, unsigned long inBuf
 int List7zFile(const char *srcFile, callback7z_t callback)
 {
     return _process7zFile(srcFile, NULL, 0, callback, DEFAULT_IN_BUF_SIZE);
-}
-
-int Extract7zFile(const char *srcFile, const char *destDir) {
-    return Extract7zFileEx(srcFile, destDir, NULL, DEFAULT_IN_BUF_SIZE);
-}
-
-int Test7zFile(const char *srcFile) {
-    return Test7zFileEx(srcFile, NULL, DEFAULT_IN_BUF_SIZE);
 }

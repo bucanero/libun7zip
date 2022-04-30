@@ -18,11 +18,11 @@ extern "C" {
 typedef void (*callback7z_t)(const char*, unsigned long, unsigned, unsigned);
 
 int Extract7zFile(const char *srcFile, const char *destDir);
-int Test7zFile(const char *srcFile);
-int List7zFile(const char *srcFile, callback7z_t callback);
-
-int Extract7zFileEx(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize);
 int Test7zFileEx(const char *srcFile, callback7z_t callback, unsigned long inBufSize);
+int Extract7zFileEx(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize);
+
+#define Test7zFile(File)                Test7zFileEx(File, NULL, DEFAULT_IN_BUF_SIZE)
+#define Extract7zFile(File, Dir)        Extract7zFile(File, Dir, NULL, DEFAULT_IN_BUF_SIZE)
 
 #ifdef __cplusplus
 }
