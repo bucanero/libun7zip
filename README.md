@@ -10,25 +10,33 @@ This library provides 7-Zip (.7z) archive handling and extraction to the PlaySta
 ### Exports
 
  - Extract7zFile
- - Extract7zFileEx
- ```c
+ - un7z_ExtractArchive
+ - un7z_ExtractAsset
+```c
 int Extract7zFile(const char *srcFile, const char *destDir);
-int Extract7zFileEx(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize);
- ```
+int un7z_ExtractArchive(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize);
+int un7z_ExtractAsset(const void *buffer, unsigned long size, const char *destDir, callback7z_t callback, unsigned long inBufSize);
+```
+
  - Test7zFile
- - Test7zFileEx
- ```c
-int Test7zFile(const char *srcFile); 
-int Test7zFileEx(const char *srcFile, callback7z_t callback, unsigned long inBufSize);
- ```
- - List7zFile
- ```c
-int List7zFile(const char *srcFile, callback7z_t callback);
- ```
+ - un7z_TestArchive
+ - un7z_TestAsset
+```c
+int Test7zFile(const char *srcFile);
+int un7z_TestArchive(const char *srcFile, callback7z_t callback, unsigned long inBufSize);
+int un7z_TestAsset(const void *buffer, unsigned long size, callback7z_t callback, unsigned long inBufSize);
+```
+
+ - un7z_ListArchive
+ - un7z_ListAsset
+```c
+int un7z_ListArchive(const char *srcFile, callback7z_t callback);
+int un7z_ListAsset(const void *buffer, unsigned long size, callback7z_t callback);
+```
 
 ## Build/Install
 
-Build the library with: 
+Build the library with:
 ```
 make
 ```

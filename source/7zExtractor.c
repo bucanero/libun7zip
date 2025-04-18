@@ -1,5 +1,9 @@
 //
-// Created by huzongyao on 17-11-24.
+// un7zip library by Bucanero
+// https://github.com/bucanero/libun7zip
+//
+// Based on https://github.com/hzy3774/AndroidUn7zip
+// by huzongyao on 17-11-24.
 //
 
 #include <sys/stat.h>
@@ -10,6 +14,7 @@
 #include "7zAlloc.h"
 #include "7zCrc.h"
 #include "7zFunctions.h"
+#include "7zAssetFile.h"
 
 #define OPTION_DETAIL 0x01
 #define OPTION_TEST 0x02
@@ -160,7 +165,6 @@ static int _process7zFile(const char *srcFile, const char *destDir, int opts, ca
         PrintError("Input File Open Error");
         return SZ_ERROR_ARCHIVE;
     }
-    mkdir(destDir, 0777);
     FileInStream_CreateVTable(&archiveStream);
     SRes res = extractStream(&archiveStream.vt, destDir, opts, callback, inBufSize);
     File_Close(&archiveStream.file);
@@ -168,20 +172,54 @@ static int _process7zFile(const char *srcFile, const char *destDir, int opts, ca
     return res;
 }
 
+static int _process7zAsset(const void *buf, size_t buf_size, const char *destDir, int opts, callback7z_t callback, size_t inBufSize)
+{
+    CAssetFileInStream archiveStream;
+    if (InAssetFile_Open(&archiveStream.assetFile, buf, buf_size)) {
+        PrintError("Memory Asset Open Error");
+        return SZ_ERROR_ARCHIVE;
+    }
+    AssetFileInStream_CreateVTable(&archiveStream);
+    SRes res = extractStream(&archiveStream.vt, destDir, opts, callback, inBufSize);
+    AssetFile_Close(&archiveStream.assetFile);
+
+    return res;
+}
+
 /**
  * extract all from 7z
  */
-int Extract7zFileEx(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize)
+int un7z_ExtractArchive(const char *srcFile, const char *destDir, callback7z_t callback, unsigned long inBufSize)
 {
+    mkdir(destDir, 0777);
     return _process7zFile(srcFile, destDir, OPTION_EXTRACT, callback, inBufSize);
 }
 
-int Test7zFileEx(const char *srcFile, callback7z_t callback, unsigned long inBufSize)
+int un7z_TestArchive(const char *srcFile, callback7z_t callback, unsigned long inBufSize)
 {
     return _process7zFile(srcFile, NULL, OPTION_TEST, callback, inBufSize);
 }
 
-int List7zFile(const char *srcFile, callback7z_t callback)
+int un7z_ListArchive(const char *srcFile, callback7z_t callback)
 {
-    return _process7zFile(srcFile, NULL, 0, callback, DEFAULT_IN_BUF_SIZE);
+    return _process7zFile(srcFile, NULL, 0, callback, UN7Z_IN_BUF_SIZE);
+}
+
+/**
+ * extract all from memory 7z buffer
+ */
+int un7z_ExtractAsset(const void *buffer, unsigned long size, const char *destDir, callback7z_t callback, unsigned long inBufSize)
+{
+    mkdir(destDir, 0777);
+    return _process7zAsset(buffer, size, destDir, OPTION_EXTRACT, callback, inBufSize);
+}
+
+int un7z_TestAsset(const void *buffer, unsigned long size, callback7z_t callback, unsigned long inBufSize)
+{
+    return _process7zAsset(buffer, size, NULL, OPTION_TEST, callback, inBufSize);
+}
+
+int un7z_ListAsset(const void *buffer, unsigned long size, callback7z_t callback)
+{
+    return _process7zAsset(buffer, size, NULL, 0, callback, UN7Z_IN_BUF_SIZE);
 }

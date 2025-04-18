@@ -1,5 +1,5 @@
 TARGET_LIB = psp-libun7zip.a
-OBJS       = source/7zAlloc.o source/7zCrc.o       source/7zFile.o      source/Bra.o     source/Delta.o   source/Ppmd7Dec.o \
+OBJS       = source/7zAlloc.o source/7zCrc.o       source/7zFile.o      source/Bra.o     source/Delta.o   source/Ppmd7Dec.o source/7zAssetFile.o \
 			source/7zArcIn.o source/7zCrcOpt.o    source/7zFunctions.o source/Bra86.o   source/Lzma2Dec.o \
 			source/7zBuf.o   source/7zDec.o       source/7zStream.o    source/BraIA64.o source/LzmaDec.o \
 			source/7zBuf2.o  source/7zExtractor.o source/Bcj2.o        source/CpuArch.o source/Ppmd7.o
