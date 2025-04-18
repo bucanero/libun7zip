@@ -27,13 +27,13 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
     CLookToRead2 lookStream;
     CSzArEx db;
     SRes res;
-    UInt16 *temp = nullptr;
+    UInt16 *temp = NULL;
     size_t tempSize = 0;
 
     LookToRead2_CreateVTable(&lookStream, False);
-    lookStream.buf = nullptr;
+    lookStream.buf = NULL;
     res = SZ_OK;
-    lookStream.buf = static_cast<Byte *>(ISzAlloc_Alloc(&allocImp, inBufSize));
+    lookStream.buf = (Byte *) ISzAlloc_Alloc(&allocImp, inBufSize);
     if (!lookStream.buf)
         res = SZ_ERROR_MEM;
     else {
@@ -54,7 +54,7 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
         if you use external function, you can make these variable as static.
         */
         UInt32 blockIndex = 0xFFFFFFFF; /* it can have any value before first call (if outBuffer = 0) */
-        Byte *outBuffer = nullptr; /* it must be 0 before first call for each new archive. */
+        Byte *outBuffer = NULL; /* it must be 0 before first call for each new archive. */
         size_t outBufferSize = 0;  /* it can have any value before first call (if outBuffer = 0) */
         CBuf fileNameBuf;
         Buf_Init(&fileNameBuf);
@@ -63,7 +63,7 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
             size_t offset = 0;
             size_t outSizeProcessed = 0;
             size_t len;
-            auto isDir = (unsigned) SzArEx_IsDir(&db, i);
+            BoolInt isDir = SzArEx_IsDir(&db, i);
             len = SzArEx_GetFileNameUtf16(&db, i, NULL);
             if (len > tempSize) {
                 SzFree(NULL, temp);
@@ -109,11 +109,10 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
                 if (options & OPTION_OUTPUT) {
                     CSzFile outFile;
                     size_t processedSize;
-                    size_t j;
                     UInt16 *name = temp;
-                    const auto *destPath = (const UInt16 *) name;
-                    for (j = 0; name[j] != 0; j++) {
-                        if (name[j] == '/') {
+                    const UInt16 *destPath = (const UInt16 *) name;
+                    for (size_t j = 0; name[j] != 0; j++) {
+                        if (name[j] == CHAR_PATH_SEPARATOR) {
                             name[j] = 0;
                             MyCreateDir(name, destDir);
                             name[j] = CHAR_PATH_SEPARATOR;
@@ -145,7 +144,7 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
         Buf_Free(&fileNameBuf, &g_Alloc);
         ISzAlloc_Free(&allocImp, outBuffer);
     }
-    SzFree(nullptr, temp);
+    SzFree(NULL, temp);
     SzArEx_Free(&db, &allocImp);
     ISzAlloc_Free(&allocImp, lookStream.buf);
     if (res != SZ_OK) {
