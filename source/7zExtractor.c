@@ -7,7 +7,6 @@
 //
 
 #include <sys/stat.h>
-#include "7zExtractor.h"
 #include "7zTypes.h"
 #include "7z.h"
 #include "7zFile.h"
@@ -15,6 +14,7 @@
 #include "7zCrc.h"
 #include "7zFunctions.h"
 #include "7zAssetFile.h"
+#include "7zExtractor.h"
 
 #define OPTION_DETAIL 0x01
 #define OPTION_TEST 0x02
@@ -135,7 +135,7 @@ extractStream(ISeekInStream *seekStream, const char *destDir,
                     if (File_Write(&outFile, outBuffer + offset, &processedSize) != 0 ||
                         processedSize != outSizeProcessed) {
                         PrintError("can not write output file");
-                        res = SZ_ERROR_FAIL;
+                        res = SZ_ERROR_WRITE;
                         break;
                     }
                     if (File_Close(&outFile)) {

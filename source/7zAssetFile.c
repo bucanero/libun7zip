@@ -62,6 +62,7 @@ WRes AssetFile_Seek(CSzAssetFile *p, Int64 *pos, ESzSeek origin) {
         p->pos = p->length;
     }
 
+    *pos = p->pos;
     return 0;
 }
 
